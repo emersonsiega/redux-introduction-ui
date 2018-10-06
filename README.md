@@ -9,5 +9,5 @@ Uses the implementation of Redux created in [redux-introduction](https://github.
 Uses real Redux, just changing some pieces of code.
 
 ## Finished app
-Finished app looks like this
+Finished app looks like this   
 ![Finished App](http://i.imgur.com/GRRjKLH.png)
