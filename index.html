@@ -185,6 +185,8 @@
             const input = document.getElementById('todo')
             const name = input.value
             input.value = ''
+            
+            if ( name.length === 0 ) return
 
             store.dispatch(addTodoAction({
                 name,
@@ -197,6 +199,8 @@
             const input = document.getElementById('goal')
             const name = input.value
             input.value = ''
+
+            if (name.length === 0) return
 
             store.dispatch(addGoalAction({
                 name,
