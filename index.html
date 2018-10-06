@@ -168,7 +168,17 @@
         }
 
         const store = createStore(rootReducer)
-        store.subscribe(() => console.log(`State changed: \n`, store.getState()))
+
+        // Map itens to list
+        store.subscribe(() => {
+            const { goals, todos } = store.getState()
+
+            document.getElementById('todos').innerHTML = ''
+            document.getElementById('goals').innerHTML = ''
+
+            goals.forEach(addGoalToDom)
+            todos.forEach(addTodoToDom)
+        })
 
         // DOM manipulation
         const addTodo = () => {
