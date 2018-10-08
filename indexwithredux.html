@@ -120,6 +120,26 @@
         /**
          * Main script
         */
+        
+        // Middleware
+        const checkAndDispatch = (store, action) => {
+            if (
+                action.type === ADD_TODO &&
+                action.todo.name.toLowerCase().includes('bitcoin')
+            ) {
+                return alert("Nope. That's a bad idea.")
+            }
+
+            if (
+                action.type === ADD_GOAL &&
+                action.goal.name.toLowerCase().includes('bitcoin')
+            ) {
+                return alert("Nope. That's a bad idea.")
+            }
+
+            return store.dispatch(action)
+        }
+
         const store = Redux.createStore(
             Redux.combineReducers({
                 todos, 
@@ -146,7 +166,7 @@
 
             if (name.length === 0) return
 
-            store.dispatch(addTodoAction({
+            checkAndDispatch(store, addTodoAction({
                 name,
                 complete: false,
                 id: generateId()
@@ -160,7 +180,7 @@
 
             if (name.length === 0) return
 
-            store.dispatch(addGoalAction({
+            checkAndDispatch(store, addGoalAction({
                 name,
                 id: generateId()
             }))
@@ -236,9 +256,9 @@
         * Add a Todo item in the list
         */
         const addTodoToDom = todo => {
-            const prepend = createPrepend(todo.id, todo.complete, () => store.dispatch(toggleTodoAction(todo.id)))
+            const prepend = createPrepend(todo.id, todo.complete, () => checkAndDispatch(store, toggleTodoAction(todo.id)))
             const text = createText(todo.name, todo.complete ? 'line-through' : 'none')
-            const append = createAppend(todo.id, () => store.dispatch(removeTodoAction(todo.id)))
+            const append = createAppend(todo.id, () => checkAndDispatch(store, removeTodoAction(todo.id)))
 
             const node = createList(todo.id, prepend, text, append)
             document.getElementById('todos').appendChild(node)
@@ -249,7 +269,7 @@
         */
         const addGoalToDom = goal => {
             const text = createText(goal.name, 'none')
-            const append = createAppend(goal.id, () => store.dispatch(removeGoalAction(goal.id)))
+            const append = createAppend(goal.id, () => checkAndDispatch(store, removeGoalAction(goal.id)))
 
             const node = createList(goal.id, undefined, text, append)
             document.getElementById('goals').appendChild(node)
