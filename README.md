@@ -7,6 +7,7 @@ Uses the implementation of Redux created in [redux-introduction](https://github.
 
 **indexwithredux.html**  
 Uses real Redux, just changing some pieces of code.
+Change Vanilla Javascript to React and connect it to Redux.
 
 ## Finished app
 Finished app looks like this   
