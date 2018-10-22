@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/react@16.3.0-alpha.1/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js"></script>
 
     <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
 </head>
@@ -63,6 +64,18 @@
             return {
                 type: TOGGLE_TODO,
                 id
+            }
+        }
+
+        const handleDeleteTodo = todo => {
+            return (dispatch) => {
+                dispatch(removeTodoAction((todo.id)))
+
+                return API.deleteTodo(todo.id)
+                    .catch(() => {
+                        dispatch(addTodoAction(todo))
+                        alert('An error ocurred! Try again.')
+                    })
             }
         }
 
@@ -139,6 +152,14 @@
             console.groupEnd()
             return result
         }
+
+        // const thunk = store => next => action => {
+        //     if ( typeof action === 'function' ) {
+        //         return action(store.dispatch)
+        //     }
+
+        //     return next(action)
+        // }
         
         /**
         * Create Redux Store
@@ -149,7 +170,7 @@
                 goals,
                 loading
             }),
-            Redux.applyMiddleware(checker, logger) 
+            Redux.applyMiddleware(ReduxThunk.default, checker, logger) 
         )
     </script>
 
@@ -191,15 +212,7 @@
                     .catch(() => alert('There was an error. Try again!'))
             }
 
-            removeItem = todo => {
-                this.props.store.dispatch(removeTodoAction((todo.id)))
-
-                return API.deleteTodo(todo.id)
-                    .catch( () => {
-                        this.props.store.dispatch(addTodoAction(todo))
-                        alert('An error ocurred! Try again.')
-                    } )
-            }
+            removeItem = todo => this.props.store.dispatch(handleDeleteTodo((todo)))
 
             toggleItem = todo => {
                 this.props.store.dispatch(toggleTodoAction(todo.id))
