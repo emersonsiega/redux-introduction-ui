@@ -256,19 +256,6 @@
             )
         }
 
-        class ConnectedTodos extends React.Component {
-            render() {
-                return (
-                    <Context.Consumer>
-                        {(store) => {
-                            const {todos} = store.getState()
-                            return <Todos dispatch={store.dispatch} todos={todos} />
-                        }}
-                    </Context.Consumer>
-                )
-            }
-        }
-
         class Todos extends React.Component {
             addItem = e => {
                 e.preventDefault()
@@ -306,19 +293,6 @@
             }
         }
 
-        class ConnectedGoals extends React.Component {
-            render() {
-                return (
-                    <Context.Consumer>
-                        {(store) => {
-                            const {goals} = store.getState()
-                            return <Goals dispatch={store.dispatch} goals={goals} />
-                        }}
-                    </Context.Consumer>
-                )
-            }
-        }
-
         class Goals extends React.Component {
             addItem = e => {
                 e.preventDefault()
@@ -352,18 +326,13 @@
 
         class App extends React.Component {
             componentDidMount() {
-                const {store} = this.props
+                const {dispatch} = this.props
 
-                store.dispatch(handleInitialData())
-
-                store.subscribe( () => this.forceUpdate() )
+                dispatch(handleInitialData())
             }
 
             render() {
-                const {store} = this.props
-                const {loading} = store.getState()
-
-                if ( loading === true ) {
+                if ( this.props.loading === true ) {
                     return (<h3>Loading...</h3>)
                 }
 
@@ -383,18 +352,6 @@
             }
         }
 
-        class ConnectedApp extends React.Component {
-            render() {
-                return (
-                    <Context.Consumer>
-                        {(store) => (
-                            <App store={store}/>
-                        )}
-                    </Context.Consumer>
-                )
-            }
-        }
-
         const Context = React.createContext()
 
         class Provider extends React.Component {
@@ -406,6 +363,53 @@
                 )
             }
         }
+
+        const connect = mapStateToProps => {
+            return (Component) => {
+                class Receiver extends React.Component {
+                    componentDidMount() {
+                        const {subscribe} = this.props.store
+                        this.unsubscribe = subscribe(() => this.forceUpdate())
+                    }
+
+                    componentWillUnmount() {
+                        this.unsubscribe()
+                    }
+
+                    render() {
+                        const {dispatch, getState} = this.props.store
+                        const state = getState()
+                        const stateNeeded = mapStateToProps(state)
+
+                        return <Component {...stateNeeded} dispatch={dispatch} />
+                    }
+                }
+
+                class ConnectedComponent extends React.Component {
+                    render() {
+                        return (
+                            <Context.Consumer>
+                                {(store) => <Receiver store={store}/>}
+                            </Context.Consumer>
+                        )
+                    }
+                }
+
+                return ConnectedComponent
+            }
+        }
+
+        const ConnectedApp = connect((state) => ({
+            loading: state.loading
+        }))(App)
+
+        const ConnectedGoals = connect((state) => ({
+            goals: state.goals
+        }))(Goals)
+
+        const ConnectedTodos = connect((state) => ({
+            todos: state.todos
+        }))(Todos)
 
         ReactDOM.render(
             <Provider store={store}>
